@@ -1,7 +1,7 @@
 db="labxss" # database
 hs="localhost" # host
-us="ferre"
-pw="9015"
+us="usuario"
+pw="senha"
 pt="5432"
 
 
