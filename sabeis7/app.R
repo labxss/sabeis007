@@ -271,7 +271,7 @@ server <- function(input, output) {
        if (input$inApresentacao == "Anos em coluna (apenas o primeiro quantificador)"){
            paste0(
                "<h2>", input$inApresentacao, "</h2> <br>", 
-               paste(as.character(input$inCampos[2]), collapse=", "),
+               paste(as.character(input$inCampos[1]), collapse=", "),
                "<br><hr>"
            )
        } else {
@@ -287,7 +287,7 @@ server <- function(input, output) {
    
    output$tf_evento_co_evento = DT::renderDataTable({
         
-       if (input$inMedicamentos == "Não (apenas da coorte selecionada)"){
+       if (input$inMedicamentos == "Não (apenas registros da coorte selecionada)"){
            sds = subset(
                ds, 
                nu_ano_competencia >= input$inAno[1] & 
@@ -331,7 +331,7 @@ server <- function(input, output) {
            sds = dcast(
                sds, 
                co_evento ~ nu_ano_competencia, 
-               value.var=input$inCampos[2], 
+               value.var=input$inCampos[1], 
                fun.aggregate = sum
            )
        }
