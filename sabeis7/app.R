@@ -8,6 +8,11 @@
 #
 
 ds=read.csv(file="vw_sia_am_coorte_202009302136.csv")
+sup=read.csv(file="td_diretriz_202010011724.csv")[,c("no_pasta","no_diretriz50","co_cid_hash","sg_tipo","ds_url","ds_publicacao")]
+sup$ds_url <- paste0("<a href='",sup$ds_url,"'>",sup$ds_publicacao,"</a>")
+sup$sg_tipo=toupper(sup$sg_tipo)
+sup$ds_publicacao=NULL
+colnames(sup)=c("no_coorte","no_dirertriz","co_cid","sg_tipo","ds_publicacao")
 
 biologicos=c(604320140, 604320124, 3650104, 601010019, 604380011, 604380062, 
              604380097, 604380070, 604320159, 3650103, 601010027, 604380020,
@@ -29,40 +34,73 @@ ui <- fluidPage(
     
     tags$h1("Medicamentos"),
     
-    tags$h3("Apresentação"),
-    
-    tags$p("Bem vindo à plataforma SABEIS."),
-    
-    tags$p("Este módulo é dedicato à extração de informações básicas de medicamentos para doenças com diretriz CONITEC."),
-    
-    tags$h3("Instruções"),
-    
-    tags$p("Selecione uma doença e copie a tabela usando os botões na parte superior."),
-    
-    tags$h3("Fonte"),
-    
-    tags$p(
-        "Dados baixados a partir do  ",
-        tags$a(href="ftp://ftp.datasus.gov.br/dissemin/publicos/", "ftp.datasus.gov.br"),
-        "em 28/08/2020."
-    ),
-    
-    p(
+    tabsetPanel(
+      
+      type = "tabs",
+      tabPanel(
+        "Início", 
+        tags$h3("Apresentação"),
+        
+        tags$p("Bem vindo à plataforma SABEIS."),
+        
+        tags$p("Este módulo é dedicato à extração de informações básicas de medicamentos para doenças com diretriz CONITEC."),
+        
+        tags$h3("Instruções"),
+        
+        tags$p("Selecione uma doença e copie a tabela usando os botões na parte superior."),
+        
+      ), # tabPanel inicio
+      
+      tabPanel(
+        "Critério",
+        
+        tags$h3("Critério de inclusão"),
+        
+        tags$p(
+          "Os documentos clínicos da CONITEC - Comissão Nacional de Incorporação de Tecnologias de Saúde do SUS foram obtidos em ",
+          tags$a(href="http://conitec.gov.br/index.php/protocolos-e-diretrizes", "http://conitec.gov.br/index.php/protocolos-e-diretrizes"),
+          "."
+        ),
+        
+        tags$p("Para cada documento foram coletados os diagnósticos (co_cid) referentes à Classificação Internacional de Doenças, CID-10."),
+        
+        
+        tags$p("A coorte (no_coorte) é obtida a partir do CID primário ou secundário do registro da guia APAC - Autorização de Procedimento Ambulatorial (Alta complexidade/custo) de a medicamentos dos Sistema de Informação Ambulatorial (SIA AM)."),
+        
+        DT::dataTableOutput("td_diretriz_202010011724")
+      ),
+      
+      tabPanel(
+        "Sobre",
+        
+        tags$h3("Fonte"),
+        
+        tags$p(
+          "Dados baixados a partir do  ",
+          tags$a(href="ftp://ftp.datasus.gov.br/dissemin/publicos/", "ftp.datasus.gov.br"),
+          "em 28/08/2020."
+        ),
+        
+        tags$h3("Citação"),
+        
+        tags$p('Ferre, F.; de Oliveira, G. L. A.; de Queiroz, M. J. & Gonçalves, F. (2020), 
+           Sala de Situação aberta com dados administrativos para gestão de Protocolos Clínicos e Diretrizes Terapêuticas de tecnologias providas pelo SUS, 
+           in SBCAS 2020.'),
+        
+        tags$h3("Código-fonte"),
+        
+        tags$p(
+          "Baixe o arquivo RShiny em ",
+          tags$a(href="https://github.com/labxss/sabeis007", "https://github.com/labxss/sabeis007"),
+          "."
+        ),
+        
+      ) # tabPanel sobre
       
     ),
     
-    tags$h3("Citação"),
     
-    tags$p('Ferre, F.; de Oliveira, G. L. A.; de Queiroz, M. J. & Gonçalves, F. (2020), 
-           Sala de Situação aberta com dados administrativos para gestão de Protocolos Clínicos e Diretrizes Terapêuticas de tecnologias providas pelo SUS, 
-           in SBCAS 2020.'),
-    
-    tags$h3("Código-fonte"),
-    
-    tags$p(
-        "Baixe o arquivo RShiny em ",
-        tags$a(href="https://github.com/labxss/sabeis007", "https://github.com/labxss/sabeis007")
-    ),
+   
     
     tags$hr(),
 
@@ -190,7 +228,7 @@ ui <- fluidPage(
                     'Tumor do Estroma Gastrointestinal' = 'c_gastro',
                     'Uveítes Não-Infecciosas' = 'uveite'
                 ),
-                selected = '1'
+                selected = 'artrite_psoriaca'
             ),
             
             sliderInput(
@@ -256,9 +294,11 @@ ui <- fluidPage(
         
         # Show a plot of the generated distribution
         mainPanel(
-            htmlOutput("rb_apresentacao"),
-            DT::dataTableOutput("tf_evento_co_evento"),
-            hr()
+          
+              htmlOutput("rb_apresentacao"),
+              DT::dataTableOutput("tf_evento_co_evento"),
+              hr()
+                 
         )
         
     ) # sidebarLayout
@@ -350,6 +390,25 @@ server <- function(input, output) {
             
         )
     })  
+   
+  # --------------------------------------------------
+   
+   output$td_diretriz_202010011724 = DT::renderDataTable({
+     datatable(
+       
+       data= sup,
+       
+       # colnames = c( ),
+       rownames= FALSE,
+       extensions = 'Buttons', options = list(
+         dom = 'Bfrtip',
+         buttons = c('copy', 'csv', 'excel', 'pdf', 'print'),
+         paging =FALSE
+       ),
+       escape = FALSE
+     )
+   })
+   
 }
 
 # Run the application 
