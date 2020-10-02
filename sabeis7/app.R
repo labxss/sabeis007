@@ -43,8 +43,18 @@ ui <- fluidPage(
         
         tags$p("Bem vindo à plataforma SABEIS."),
         
-        tags$p("Este módulo é dedicato à extração de informações básicas de medicamentos para doenças com diretriz CONITEC."),
+        tags$p("Este módulo é dedicado à extração de informações básicas de medicamentos para doenças com diretriz CONITEC."),
         
+        tags$p("Atenção, as agregações foram realizadas por medicamento (co_evento) ao ano."),
+        
+        tags$p(
+            "A partir de 2008 a variável co_evento contem os códigos do ",
+            tags$a(href="http://sigtap.datasus.gov.br/tabela-unificada/app/download.jsp", "SIGTAP - Sistema de Gerenciamento da Tabela de Procedimentos, Medicamentos e OPM do SUS"),
+            "."
+        ),
+        
+        
+                
         tags$h3("Instruções"),
         
         tags$p("Selecione uma doença e copie a tabela usando os botões na parte superior."),
@@ -65,7 +75,7 @@ ui <- fluidPage(
         tags$p("Para cada documento foram coletados os diagnósticos (co_cid) referentes à Classificação Internacional de Doenças, CID-10."),
         
         
-        tags$p("A coorte (no_coorte) é obtida a partir do CID primário ou secundário do registro da guia APAC - Autorização de Procedimento Ambulatorial (Alta complexidade/custo) de a medicamentos dos Sistema de Informação Ambulatorial (SIA AM)."),
+        tags$p("A coorte (no_coorte) é obtida a partir do CID primário ou secundário do registro da guia APAC - Autorização de Procedimento Ambulatorial (Alta complexidade/custo) de laudo de medicamentos (AM) do Sistema de Informação Ambulatorial (SIA)."),
         
         DT::dataTableOutput("td_diretriz_202010011724")
       ),
@@ -287,7 +297,7 @@ ui <- fluidPage(
                 "inApresentacao", 
                 "Apresentação",
                 c("Anos em linha (todas as variáveis)",
-                  "Anos em coluna (apenas o primeiro quantificador)")
+                  "Anos em colunas (apenas o primeiro quantificador)")
             )
             
         ), # sidebarPanel
@@ -367,7 +377,7 @@ server <- function(input, output) {
            )
        }
        
-       if (input$inApresentacao == "Anos em coluna (apenas o primeiro quantificador)"){
+       if (input$inApresentacao == "Anos em colunas (apenas o primeiro quantificador)"){
            sds = dcast(
                sds, 
                co_evento ~ nu_ano_competencia, 
